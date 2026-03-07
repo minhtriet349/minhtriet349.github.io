@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>For Đinh Đa của anh 💕</title>
+
+<style>
+body{
+margin:0;
+font-family:Arial,sans-serif;
+background:linear-gradient(135deg,#ffd6e0,#ffe5ec);
+display:flex;
+justify-content:center;
+align-items:center;
+min-height:100vh;
+padding:15px;
+box-sizing:border-box;
+}
+
+#box{
+width:100%;
+max-width:750px;
+background:white;
+border-radius:25px;
+padding:30px;
+box-shadow:0 0 40px rgba(255,105,135,0.4);
+text-align:center;
+position:relative;
+}
+
+.hidden{display:none;}
+
+h2{
+font-size:30px;
+color:#ff4d6d;
+text-shadow:0 0 12px #ff8fab;
+}
+
+p{
+font-size:22px;
+color:#ff4d6d;
+text-shadow:0 0 8px #ffc2d1;
+}
+
+button{
+padding:15px 30px;
+margin:10px;
+border:none;
+border-radius:40px;
+cursor:pointer;
+font-size:18px;
+font-weight:bold;
+transition:0.2s;
+box-shadow:0 0 15px rgba(255,105,135,0.4);
+}
+
+button:hover{
+transform:scale(1.05);
+box-shadow:0 0 25px rgba(255,105,135,0.7);
+}
+
+.yes{background:#ff4d6d;color:white;}
+.no{background:#ffd6e0;color:#ff4d6d;}
+
+.topbar{
+display:flex;
+justify-content:center;
+gap:50px;
+font-size:22px;
+font-weight:bold;
+color:#ff4d6d;
+text-shadow:0 0 8px #ffb3c6;
+}
+
+#gameArea{
+position:relative;
+height:260px;
+margin-top:20px;
+overflow:hidden;
+}
+
+.item{
+position:absolute;
+font-size:34px;
+cursor:pointer;
+}
+
+#result{
+margin-top:20px;
+padding:20px;
+background:#fff0f5;
+border-radius:18px;
+font-size:24px;
+color:#ff4d6d;
+line-height:1.8;
+text-shadow:0 0 10px #ffc2d1;
+box-shadow:0 0 25px rgba(255,105,135,0.3);
+}
+</style>
+</head>
+
+<body>
+
+<audio id="bgMusic" loop>
+<source src="music.mp3" type="audio/mpeg">
+</audio>
+
+<div id="box">
+
+<div id="loading">
+<h2>💌 Đang chuẩn bị điều bất ngờ cho cô bé Ngốc...</h2>
+</div>
+
+<div id="intro" class="hidden">
+<h2>Trò chơi nhỏ cho Đa nè 💕</h2>
+<p>Bấm 💖 và né 💣 trong 20 giây nha</p>
+<button class="yes" onclick="startGame()">Chơi Luôn 💕</button>
+<button class="no" onclick="noPlay()">Không 😝</button>
+</div>
+
+<div id="game" class="hidden">
+<div class="topbar">
+<div>⏰ <span id="time">20</span>s</div>
+<div>💖 <span id="score">0</span></div>
+</div>
+<div id="gameArea"></div>
+<div id="result" class="hidden"></div>
+<button id="nextBtn" class="yes hidden" onclick="showConfirm()">Nhấn vào đây giúp anh 💕</button>
+</div>
+
+<div id="confirmBox" class="hidden">
+<h2>Cho anh hunn một cái nha 🤗</h2>
+<button class="yes" onclick="acceptLove()">Em chịu ạaaaaa 💞</button>
+<button class="no" id="noBtn">Không 😝</button>
+</div>
+
+</div>
+
+<script>
+
+/* Loading */
+setTimeout(()=>{
+loading.classList.add("hidden");
+intro.classList.remove("hidden");
+},2000);
+
+/* Không chơi */
+function noPlay(){
+let overlay=document.createElement("div");
+overlay.style.position="fixed";
+overlay.style.top=0;
+overlay.style.left=0;
+overlay.style.width="100%";
+overlay.style.height="100%";
+overlay.style.background="rgba(0,0,0,0.85)";
+overlay.style.zIndex=999;
+document.body.appendChild(overlay);
+
+for(let i=0;i<30;i++){
+let cry=document.createElement("div");
+cry.innerHTML="😭";
+cry.style.position="absolute";
+cry.style.left=Math.random()*100+"vw";
+cry.style.top="-50px";
+cry.style.fontSize="60px";
+cry.style.transition="transform 1s linear";
+overlay.appendChild(cry);
+setTimeout(()=>cry.style.transform="translateY(120vh)",20);
+}
+setTimeout(()=>overlay.remove(),1000);
+}
+
+/* Game */
+let score=0;
+let timeLeft=20;
+let spawnInterval;
+let timerInterval;
+
+function startGame(){
+
+let music=document.getElementById("bgMusic");
+music.volume=0.4;
+music.play();
+
+intro.classList.add("hidden");
+game.classList.remove("hidden");
+
+spawnInterval=setInterval(spawnItem,500);
+timerInterval=setInterval(()=>{
+timeLeft--;
+time.innerText=timeLeft;
+if(timeLeft<=0){
+clearInterval(spawnInterval);
+clearInterval(timerInterval);
+endGame();
+}
+},1000);
+}
+
+function spawnItem(){
+let item=document.createElement("div");
+item.className="item";
+let bomb=Math.random()<0.25;
+item.innerHTML=bomb?"💣":"💖";
+item.style.left=Math.random()*(gameArea.clientWidth-30)+"px";
+item.style.top=Math.random()*(gameArea.clientHeight-30)+"px";
+
+item.onclick=function(){
+if(!bomb){
+score++;
+document.getElementById("score").innerText=score;
+}
+item.remove();
+};
+
+gameArea.appendChild(item);
+setTimeout(()=>item.remove(),1500);
+}
+
+function endGame(){
+let message="";
+
+if(score<=5){
+message=`
+Chỉ cần em dành thời gian ở đây thôi là anh đã thấy vui rồi 💗  
+Với anh, điều quan trọng không phải kết quả,  
+mà là khoảnh khắc em đang ở đây.
+`;
+}
+else if(score<=10){
+message=`
+Mỗi lần em chạm vào một trái tim,  
+anh lại cảm giác như tim mình đang được em chạm nhẹ vậy 💖  
+Em làm mọi thứ trở nên ấm áp hơn rất nhiều.
+`;
+}
+else if(score<=15){
+message=`
+Nhìn em chơi mà anh thấy dễ thương vô cùng luôn đó 🥺💕  
+Em giống như một điều nhỏ bé nhưng lại làm cả thế giới của anh sáng lên.
+`;
+}
+else{
+message=`
+Thật ra từ lâu em đã chiếm trọn trái tim anh rồi 💘  
+Chỉ cần em ở bên,  
+mỗi ngày với anh đều là một ngày đặc biệt.
+`;
+candyRain();
+}
+
+result.innerHTML=message;
+result.classList.remove("hidden");
+nextBtn.classList.remove("hidden");
+}
+
+/* Mưa kẹo */
+function candyRain(){
+let overlay=document.createElement("div");
+overlay.style.position="fixed";
+overlay.style.top=0;
+overlay.style.left=0;
+overlay.style.width="100%";
+overlay.style.height="100%";
+overlay.style.pointerEvents="none";
+overlay.style.zIndex=999;
+document.body.appendChild(overlay);
+
+let candy=["🍬","🍭","🍫","🍡"];
+for(let i=0;i<60;i++){
+let c=document.createElement("div");
+c.innerHTML=candy[Math.floor(Math.random()*candy.length)];
+c.style.position="absolute";
+c.style.left=Math.random()*100+"vw";
+c.style.top="-50px";
+c.style.fontSize="30px";
+c.style.transition="transform 4s linear,opacity 4s linear";
+overlay.appendChild(c);
+setTimeout(()=>{
+c.style.transform="translateY(120vh)";
+c.style.opacity="0";
+},50);
+setTimeout(()=>c.remove(),4000);
+}
+setTimeout(()=>overlay.remove(),4500);
+}
+
+/* Confirm */
+function showConfirm(){
+game.classList.add("hidden");
+confirmBox.classList.remove("hidden");
+
+let noBtn=document.getElementById("noBtn");
+noBtn.addEventListener("mouseover",()=>{
+noBtn.style.position="absolute";
+noBtn.style.left=Math.random()*70+"%";
+noBtn.style.top=Math.random()*70+"%";
+});
+}
+
+/* Ôm */
+function acceptLove(){
+confirmBox.style.display="none";
+
+let screen=document.createElement("div");
+screen.style.position="fixed";
+screen.style.top=0;
+screen.style.left=0;
+screen.style.width="100%";
+screen.style.height="100%";
+screen.style.background="black";
+screen.style.display="flex";
+screen.style.flexDirection="column";
+screen.style.justifyContent="center";
+screen.style.alignItems="center";
+screen.style.zIndex=999;
+document.body.appendChild(screen);
+
+let img=document.createElement("img");
+img.src="hug.gif";
+img.style.width="80%";
+img.style.maxWidth="450px";
+img.style.borderRadius="20px";
+screen.appendChild(img);
+
+let count=document.createElement("div");
+count.style.color="#ff4d6d";
+count.style.fontSize="24px";
+count.style.marginTop="15px";
+count.style.textShadow="0 0 15px #ff8fab";
+screen.appendChild(count);
+
+let t=5;
+count.innerText="Đang hunn... "+t+"s";
+
+let interval=setInterval(()=>{
+t--;
+count.innerText="Đang hunn... "+t+"s";
+if(t<=0){
+clearInterval(interval);
+screen.remove();
+finalScreen();
+}
+},1000);
+}
+
+/* Final */
+function finalScreen(){
+let overlay=document.createElement("div");
+overlay.style.position="fixed";
+overlay.style.top=0;
+overlay.style.left=0;
+overlay.style.width="100%";
+overlay.style.height="100%";
+overlay.style.background="black";
+overlay.style.display="flex";
+overlay.style.justifyContent="center";
+overlay.style.alignItems="center";
+overlay.style.flexDirection="column";
+overlay.style.zIndex=999;
+overlay.innerHTML="<div style='color:#ff4d6d;font-size:28px;text-shadow:0 0 20px #ff8fab;'>Cảm ơn em vì đã xuất hiện trong thanh xuân của anh <br> 💖 Anh thương Đinh Đa rất rất nhiều luôn á 🥰</div>";
+document.body.appendChild(overlay);
+
+setInterval(()=>{
+for(let i=0;i<6;i++){
+let heart=document.createElement("div");
+heart.innerHTML="💘";
+heart.style.position="absolute";
+heart.style.left=Math.random()*100+"vw";
+heart.style.bottom="-50px";
+heart.style.fontSize="30px";
+heart.style.transition="transform 4s linear,opacity 4s linear";
+overlay.appendChild(heart);
+setTimeout(()=>{
+heart.style.transform="translateY(-120vh)";
+heart.style.opacity="0";
+},50);
+setTimeout(()=>heart.remove(),4000);
+}
+},200);
+}
+
+</script>
+</body>
+</html>
